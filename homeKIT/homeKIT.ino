@@ -1,12 +1,12 @@
+#define HTTP_RES    "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
+
 #include <ESP8266WiFi.h>
-#include "Fast.h"
 
 
 const char* ssid = "Airport";
 const char* password = "Allyouneedislove";
 
 WiFiServer server(80);
-Fast app();
 
 byte r, g, b = 0;
 String s = "";
@@ -58,24 +58,27 @@ void loop() {
   // Match the request
   if (req.indexOf("/rgb/off") != -1) {
     val = 0;
-    s = app.res("");
+    s = HTTP_RES;
   } else if (req.indexOf("/rgb/on") != -1) {
     val = 1;
-    s = app.res("");
+    s = HTTP_RES;
   } else if (req.indexOf("/rgb/status") != -1) {
-    s = app.res("");
+    s = HTTP_RES;
     s += val ?  "1" : "0";
   } else if (req.indexOf("/rgb/brightness") != -1) {
-    s = app.res((val) ?  String(map((0.2126 * r + 0.7152 * g + 0.0722 * b), 0 , 255 , 0 , 100)) : "0");
+    s = HTTP_RES;
+    s += (val) ?  String(map((0.2126 * r + 0.7152 * g + 0.0722 * b), 0 , 255 , 0 , 100)) : "0";
+
   } else if (req.indexOf("/rgb/colorset") != -1) {
-    s = app.res();
+    s = HTTP_RES;
     if (req.indexOf("NANNAN") != -1) {
       hexColor = "0xFFFFFF";
     } else {
       hexColor = req.substring(18, 24);
     }
   } else if (req.indexOf("/rgb/set") != -1) {
-    s = app.res(hexColor);
+    s = HTTP_RES;
+    s += hexColor;
   } else {
     client.stop();
     return;
